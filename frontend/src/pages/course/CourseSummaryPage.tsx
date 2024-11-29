@@ -5,10 +5,11 @@ import { useUserInfo } from "../../hooks/useUserInfo";
 import SidebarPageTemplate from "../../templates/SidebarPageTemplate";
 import { CourseGroupTable } from "./CourseGroupTable";
 import { useState, useEffect } from "react";
-
+import { DownloadCSVButton } from "../../components/DownloadCSVButton";
 
 export function CourseSummaryPage() {
   const [courseCode, setCourseCode] = useState<string | null>(null);
+  const [isTableRendered, setIsTableRendered] = useState(false);
 
   useEffect(() => {
     const fetchCourses = async () => {
@@ -39,13 +40,15 @@ export function CourseSummaryPage() {
   return (
     <UserInfoContext.Provider value={userInfo}>
       <SidebarPageTemplate hidden={!displayContent}>
-        <div className="bg-[#9B394B] p-3 h-full">
-          <div className="bg-[#FCF4F5] rounded-2xl p-6 h-full">
+        <div className="bg-[#9B394B] p-3 min-h-full">
+          <div className="bg-[#FCF4F5] rounded-2xl p-6 min-h-full">
             <div className="flex flex-col module rounded-2xl shadow-md p-4">
               <h1 className="text-2xl font-bold text-white">
                 Summary View of {courseCode}
               </h1>
-              <CourseGroupTable courseid={courseid||""}/>
+              <CourseGroupTable courseid={courseid || ""} 
+              onTableRendered={() => setIsTableRendered(true)}/>
+              {isTableRendered && <DownloadCSVButton courseid={courseid || ""} />}
             </div>
           </div>
         </div>

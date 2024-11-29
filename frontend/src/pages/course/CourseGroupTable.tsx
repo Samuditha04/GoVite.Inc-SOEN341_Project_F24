@@ -8,12 +8,11 @@ interface StudentReview {
   ratings: RatingResponse;
 }
 
-export function CourseGroupTable(props: {courseid: string}) {
+export function CourseGroupTable(props: { courseid: string; onTableRendered?: () => void }) {
   const [reviews, setReviews] = useState<StudentReview[]>();
 
   useEffect(() => {
-      GetDetailedCourseInfo(props.courseid)
-      .then((data)=> {
+      GetDetailedCourseInfo(props.courseid).then((data)=> {
         const flattenedReviews: StudentReview[] = data.teams.flatMap((team) =>
           team.students.map((student) => {
             // Counts how many peers have rated the student
@@ -48,9 +47,13 @@ export function CourseGroupTable(props: {courseid: string}) {
         );
 
         setReviews(flattenedReviews);
-      })
 
-  }, []);
+        // Notify parent when table is ready
+        if (flattenedReviews.length > 0 && props.onTableRendered) {
+          props.onTableRendered();
+        }
+      });
+  }, [props.courseid, props.onTableRendered]);
 
   return (
     <>
@@ -112,7 +115,8 @@ export function CourseGroupTable(props: {courseid: string}) {
               {reviews.map((review, index) => (
                 <tr
                   key={index}
-                  className="bg-white hover:bg-slate-100 border-b text-[#333333] text-center"
+                  className="bg-white hover:bg-slate-100 border-b text-[#333333] text-center cursor-pointer"
+                  onClick={() => window.open(`/profile/${review.student.email}`)}
                 >
                   <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
                     {review.student.username}
